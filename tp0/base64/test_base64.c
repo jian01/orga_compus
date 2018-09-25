@@ -36,6 +36,12 @@ void test_encode_3bytes(){
   encoding = base64_transform_3bytes(prueba3);
   print_test("Si encodeo '*fr' recibo 'KmZy'", byte_compare(encoding, "KmZy", 4));
   free(encoding);
+
+  char prueba4[] = {0x2E, 0xF9, 0x49};
+  const char* salida_esperada4="LvlJ";
+  encoding = base64_transform_3bytes(prueba4);
+  print_test("Caso de prueba 4", byte_compare(encoding, salida_esperada4, 4));
+  free(encoding);
 }
 
 void test_encode_base64(){
@@ -60,9 +66,9 @@ void test_encode_base64(){
 
   const char* prueba4 = "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.";
   longitud = base64_encode_bytes((char*) prueba4, strlen(prueba4), &encoding);
-  const char* salida_esperada = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
-  print_test("Encodeo un texto largo (wikipedia)", byte_compare(encoding, salida_esperada, longitud));
-  print_test("La longitud devuelta es correcta", longitud==strlen(salida_esperada));
+  const char* salida_esperada4 = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
+  print_test("Encodeo un texto largo (wikipedia)", byte_compare(encoding, salida_esperada4, longitud));
+  print_test("La longitud devuelta es correcta", longitud==strlen(salida_esperada4));
   free(encoding);
 }
 
@@ -106,6 +112,10 @@ void test_decode_4bytes(){
   longitud = base64_decode_4bytes(prueba5, &decode);
   print_test("Si desencodeo 'Jj==' recibo '&'", byte_compare(decode, "&", longitud));
   free(decode);
+
+  char prueba6[] = {'@', 'j', '=', '='};
+  longitud = base64_decode_4bytes(prueba6, &decode);
+  print_test("Si desencodeo '@j==' falla", longitud==-1);
 }
 
 void test_decode_bytes(){
@@ -134,6 +144,14 @@ void test_decode_bytes(){
   print_test("Desencodeo un texto largo (wikipedia)", byte_compare(decode, salida_esperada, longitud));
   print_test("La longitud devuelta es correcta", longitud==strlen(salida_esperada));
   free(decode);
+
+  char prueba5[] = {'Y', 'W', 'J', 'j', 'Z', 'G', '#', 'm', 'Z', '2', 'g', '='};
+  longitud = base64_decode_bytes(prueba5, 12, &decode);
+  print_test("Si desencodeo 'YWJjZG#mZ2g=' falla", longitud=-1);
+
+  char prueba6[] = {'Y', 'W', 'J', 'j', 'Z', 'G', 'V', 'm', 'Z', '2', 'g'};
+  longitud = base64_decode_bytes(prueba5, 11, &decode);
+  print_test("Si desencodeo 'YWJjZG#mZ2g' falla", longitud=-1);
 }
 
 int main(){

@@ -52,29 +52,25 @@ void imprimir_ayuda(){
 
 int encode_file(FILE* input_file, FILE* output_file){
   bool stop = false;
-  int longitud;  
+  int longitud;
   while (!stop){
     char byte_leido;
     char* encoding;
     char* linea = (char*)malloc(sizeof(char)*BYTES_A_LEER);
-    int cantidad_bytes_leidos = 0;  
-    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF)  {         
+    int cantidad_bytes_leidos = 0;
+    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF)  {
       linea[cantidad_bytes_leidos] = byte_leido;
       cantidad_bytes_leidos++;
     }
-    for(int i=0;i<cantidad_bytes_leidos;i++){
-      fprintf(stderr, " %#02x ", linea[i]);
-    }
-    fprintf(stderr, "\n");
     if(byte_leido == EOF) stop = true;
     if(cantidad_bytes_leidos != 0){
       longitud = base64_encode_bytes(linea, cantidad_bytes_leidos, &encoding);
       fwrite((void*)encoding, 1, longitud, output_file);
       free(encoding);
-    }       
+    }
     free(linea);
-  }   
-  
+  }
+
   return 1;
 }
 
@@ -87,21 +83,17 @@ int decode_file(FILE* input_file, FILE* output_file){
     char* decoding;
     int i;
     int cantidad_bytes_leidos = 0;
-    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF) {      
+    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF) {
       linea[cantidad_bytes_leidos] = byte_leido;
       cantidad_bytes_leidos++;
     }
-    if(byte_leido == EOF) stop = true;  
+    if(byte_leido == EOF) stop = true;
     if(cantidad_bytes_leidos != 0){
       longitud = base64_decode_bytes(linea, cantidad_bytes_leidos, &decoding);
-      for(int i=0;i<longitud;i++){
-        fprintf(stderr, " %#02x ", decoding[i]);
-      }
-      fprintf(stderr, "\n");
       fwrite((void*)decoding, 1, longitud, output_file);
       free(decoding);
-    }    
-    free(linea);  
+    }
+    free(linea);
   }
   return 1;
 }
@@ -199,4 +191,3 @@ int main(int argc, char* argv[]){
   }
   return EXIT_SUCCESS;
 }
-

@@ -13,7 +13,8 @@ char decode_byte(char byte){
   if(byte>='a' && byte<='z') return (byte-'a')+26;
   if(byte>='0' && byte<='9') return (byte-'0')+52;
   if(byte=='+') return 62;
-  return 63;
+  if(byte=='/') return 63;
+  return -1;
 }
 
 char* base64_transform_3bytes(char* bytes){
@@ -26,13 +27,13 @@ char* base64_transform_3bytes(char* bytes){
       return NULL;
     }
     if(i==0){
-      base64[i] = extracted[0] >> 2;
+      base64[i] = (unsigned char)extracted[0] >> 2;
     } else if(i==1){
-      base64[i] = extracted[0] << 4 | extracted[1] >> 4;
+      base64[i] = (unsigned char)extracted[0] << 4 | (unsigned char)extracted[1] >> 4;
     } else if(i==2){
-      base64[i] = extracted[0] << 2 | extracted[1] >> 6;
+      base64[i] = (unsigned char)extracted[0] << 2 | (unsigned char)extracted[1] >> 6;
     } else {
-      base64[i] = extracted[0];
+      base64[i] = (unsigned char)extracted[0];
     }
     free(extracted);
     base64[i] = base64_table[base64[i]];
@@ -43,7 +44,7 @@ char* base64_transform_3bytes(char* bytes){
 int base64_encode_bytes(char* bytes, int tam, char** dest){
   int offset = tam%3>0 ? abs(tam%3-3) : 0;
   int bytes_to_transform = tam + offset;
-  
+
   char* copy = (char*) calloc(bytes_to_transform, 1);
   if(!copy) return -1;
   memcpy(copy, bytes, tam);
@@ -80,6 +81,11 @@ int base64_decode_4bytes(char* bytes, char** dest){
   char* copy = (char*)malloc(4);
   memcpy(copy, bytes, 4);
   for(int i=0;i<4;i++){
+    if(decode_byte(copy[i])==-1 && copy[i]!='='){
+      free(copy);
+      free(aux);
+      return -1;
+    }
     copy[i] = decode_byte(copy[i]);
   }
   for(int i=0;i<4;i++){
@@ -117,6 +123,7 @@ int base64_decode_4bytes(char* bytes, char** dest){
 
 int base64_decode_bytes(char* bytes, int tam, char** dest){
   char* result = NULL;
+  if(tam%4!=0) return -1;
   char* decoded;
   int longitud;
   int longitud_total = 0;
