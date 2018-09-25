@@ -1,0 +1,74 @@
+\documentclass[11pt]{article}
+
+%acentos
+\usepackage[utf8]{inputenc}
+
+%comentarios.
+\usepackage{comment}
+
+%margenes.
+\usepackage[left=2.5cm, right=2.5cm, top=1.5cm]{geometry}
+
+%insertar codigo.
+\usepackage{listings}
+%de todos modos user verbatim porque quedaba mejor.
+
+%colores.
+\usepackage[usenames]{color}
+
+%tablas.
+\usepackage{booktabs}
+
+%formato titulos y subtitulos,
+\usepackage{sectsty}
+\sectionfont{\bfseries\huge}
+\subsectionfont{\normalfont\LARGE\itshape}
+
+%incluir codigo en C.
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{blue(munsell)}{rgb}{0.0, 0.5, 0.69}
+
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{backgroundColour},   
+    commentstyle=\color{mGreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{mGray},
+    stringstyle=\color{mPurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C
+}
+
+\begin{document}
+    \section*{Detalles de implementación}
+        Para lograr una mayor división del trabajo y con el objetivo de testear mejor las distintas funcionalidades que fueron necesario programar para la elaboración del tp, se decidió dividir al código en distintas librerías e incluir los distintos archivos $.h$ en caso de necesitarlos.\\
+        La primera librería escrita fue $bit\_library.h$. En esta, se pueden encontrar distintas funciones que permiten realizar operaciones con bits, desde encontrar si un bit dentro de un byte está encendido o no hasta elaborar máscaras determinadas. Esta librería fue codificada sabiendo que las funciones que provee serían necesarias para realizar las operaciones necesarias para realizar el $encoding$ y $decoding$. \\
+        En segundo lugar, nos encontramos con la librería $base\_64.h$ Esta librería es la que servirá como interfaz para el programa principal. En ella, se encuentran las funciones encargadas de realizar el $encoding$ y el $decoding$ de los distintos bytes que se pasen por parámetro. \\
+        Por último, tenemos el problema principal. En la función $main()$ hay un ciclo que recorre el vector de parámetros que se recibe al ejecutar el programa, y los va procesando hasta terminar. En caso de que haya algún error en el pasaje de parámetros, se imprime un error por \textbf{stderr}. Los errores están relacionados a un mal orden en los parámetros, a la utilización de nombres incorrectos y también al pasaje de una cantidad incorrecta de los mismos. Luego, en el programa hay dos funciones que se encargan de encodificar o decodificar un archivo, que son las que se encargan de leer el archivo de entrada, encodificar o decodificar según corresponda, y escribir sobre el archivo de salida.
+    \section*{Comandos de compilación}
+
+    \section*{Corridas de prueba}
+        A continuación se detallan las corridas de prueba del programa. Se intentó que éstas sean lo más abarcativas posibles, mostrando casos en los que funciona el encoding y el decoding, tomando archivos reales físicos y también los archivos estándar de entrada y salida, así como también se intenta mostrar cuáles son todos los posibles errores por los cuáles el programa muestra un error.\\
+        \\
+        Empecemos entonces por algunas corridas triviales por $stdin$, para mostrar que se codifica y decodifica correctamente.\\
+        Codificamos el caracter ASCII M
+        
+    \section*{Código fuente}
+    \section*{Código MIPS32}
+    \end{document}

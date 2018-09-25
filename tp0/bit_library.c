@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
-#define IS_BIG_ENDIAN BIG_ENDIAN
+#define IS_BIG_ENDIAN true
 
 bool byte_nth_bit(char byte, int n){
   if(IS_BIG_ENDIAN) n = abs(n-7);

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 // Todos los parametros de posicion son bits y empiezan en 0
 
 // Recibe un byte y una posicion y devuelve un booleano indicando si el byte es 1 o 0

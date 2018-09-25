@@ -43,6 +43,7 @@ char* base64_transform_3bytes(char* bytes){
 int base64_encode_bytes(char* bytes, int tam, char** dest){
   int offset = tam%3>0 ? abs(tam%3-3) : 0;
   int bytes_to_transform = tam + offset;
+  
   char* copy = (char*) calloc(bytes_to_transform, 1);
   if(!copy) return -1;
   memcpy(copy, bytes, tam);
