@@ -25,6 +25,7 @@
 #define DECODE "decode"
 #define ERROR_ACCION "Invalid action. Please use an allowed action. See the help menu."
 #define ERROR_NO_ACCION "Please, specify the action. Default action is encoding."
+#define ERROR_PERFORMING_ACTION "An error ocurred while trying to perform your request."
 
 void imprimir_ayuda(){
   printf("\
@@ -54,24 +55,29 @@ int encode_file(FILE* input_file, FILE* output_file){
   bool stop = false;
   int longitud;
   while (!stop){
-    char byte_leido;
+    int byte_leido;
     char* encoding;
     char* linea = (char*)malloc(sizeof(char)*BYTES_A_LEER);
+    if(!linea) return -1;
     int cantidad_bytes_leidos = 0;
     while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF)  {
-      linea[cantidad_bytes_leidos] = byte_leido;
+      linea[cantidad_bytes_leidos] = (char)byte_leido;
       cantidad_bytes_leidos++;
     }
     if(byte_leido == EOF) stop = true;
     if(cantidad_bytes_leidos != 0){
       longitud = base64_encode_bytes(linea, cantidad_bytes_leidos, &encoding);
+      if(longitud<0){
+        free(linea);
+        return -1;
+      }
       fwrite((void*)encoding, 1, longitud, output_file);
       free(encoding);
     }
     free(linea);
   }
 
-  return 1;
+  return EXIT_SUCCESS;
 }
 
 int decode_file(FILE* input_file, FILE* output_file){
@@ -79,32 +85,38 @@ int decode_file(FILE* input_file, FILE* output_file){
   int longitud;
   while(!stop){
     char* linea = malloc(sizeof(char)*BYTES_A_LEER);
-    char byte_leido;
+    if(!linea) return -1;
+    int byte_leido;
     char* decoding;
     int i;
     int cantidad_bytes_leidos = 0;
     while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF) {
-      linea[cantidad_bytes_leidos] = byte_leido;
+      linea[cantidad_bytes_leidos] = (char)byte_leido;
       cantidad_bytes_leidos++;
     }
     if(byte_leido == EOF) stop = true;
     if(cantidad_bytes_leidos != 0){
       longitud = base64_decode_bytes(linea, cantidad_bytes_leidos, &decoding);
+      if(longitud<0){
+        return -1;
+      }
       fwrite((void*)decoding, 1, longitud, output_file);
       free(decoding);
     }
     free(linea);
   }
-  return 1;
+  return EXIT_SUCCESS;
 }
 
 int main(int argc, char* argv[]){
   int i = 1;
+  int result=0;
 
   //default encode entrada estandar.
   if (argc == 1){
-    encode_file(stdin, stdout);
-    return EXIT_SUCCESS;
+    int result = encode_file(stdin, stdout);
+    if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
+    return result;
   }
 
   //ayuda o version.
@@ -117,7 +129,7 @@ int main(int argc, char* argv[]){
       fprintf(stderr, "%s\n", ERROR_NO_ACCION);
     else
       fprintf(stderr, "%s\n", ERROR_PARAMETROS);
-    return EXIT_SUCCESS;
+    return -1;
   }
 
   //encode o decode.
@@ -129,34 +141,35 @@ int main(int argc, char* argv[]){
       else if (strcmp(argv[i], DECODE) == 0) encode = false;
       else{
         fprintf(stderr, "%s\n", ERROR_ACCION);
-        return EXIT_SUCCESS;
+        return -1;
       }
       i++;
       //caso ./main -a encode(decode) sin archivos.
       if (!argv[i]){
         if (encode)
-          encode_file(stdin, stdout);
+          result = encode_file(stdin, stdout);
         else
-          decode_file(stdin, stdout);
-        return EXIT_SUCCESS;
+          result = decode_file(stdin, stdout);
+        if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
+        return result;
       }
       //./main -a encode(decode) -i inputfile
       if (strcmp(argv[i], INPUT_FILE) == 0){
         i++;
         if(!argv[i]){
           fprintf(stderr, "%s\n", ERROR_NO_INPUT_FILE);
-          return EXIT_SUCCESS;
+          return -1;
         }
         FILE* input_file = fopen(argv[i], "r");
         if(!input_file){
           fprintf(stderr, "%s\n", ERROR_ARCHIVO);
-          return EXIT_SUCCESS;
+          return -1;
         }
         i++;
         if(!argv[i]){
           fprintf(stderr, "%s\n", ERROR_NO_OUTPUT_FILE);
           fclose(input_file);
-          return EXIT_SUCCESS;
+          return -1;
         }
         // ./main -a encode(decode) -i inputfile -o outputfile
         if(strcmp(argv[i], OUTPUT_FILE) == 0){
@@ -164,30 +177,33 @@ int main(int argc, char* argv[]){
           if(!argv[i]){
             fprintf(stderr, "%s\n", ERROR_NO_OUTPUT_FILE);
             fclose(input_file);
-            return EXIT_SUCCESS;
+            return -1;
           }
           FILE* output_file = fopen(argv[i], "w");
           if(encode){
-            encode_file(input_file, output_file);
+            result = encode_file(input_file, output_file);
           }
           else{
-            decode_file(input_file, output_file);
+            result = decode_file(input_file, output_file);
           }
+          if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
+          return result;
         }
         else{
           fprintf(stderr, "%s\n", ERROR_PARAMETROS);
           fclose(input_file);
-          return EXIT_SUCCESS;
+          return -1;
         }
       }
       else{
         fprintf(stderr, "%s\n", ERROR_PARAMETROS);
-        return EXIT_SUCCESS;
+        return -1;
       }
     }
   }
   else{
     fprintf(stderr, "%s\n", ERROR_CANTIDAD_PARAMETROS);
+    return -1;
   }
   return EXIT_SUCCESS;
 }
