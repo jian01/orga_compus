@@ -143,40 +143,63 @@ void test_bytes_extract_n_bits(){
 
   resultado = (char*)bytes_extract_n_bits(arreglo, 0, 7);
   print_test("Si agarro 'a' con un slice sigue siendo 'a'", resultado[0]=='a');
+   
+   
 
   resultado = (char*)bytes_extract_n_bits(arreglo, 0, 6);
   print_test("Si agarro 97 con un bit menos se conviente en 96", resultado[0]==96);
-  
+   
+   
+
   resultado = (char*)bytes_extract_n_bits(arreglo, 1, 6);
   print_test("Si agarro 97[1:6] se conviente en 96", resultado[0]==96);
-  
+   
+   
+
   resultado = (char*)bytes_extract_n_bits(arreglo, 2, 6);
   print_test("Si agarro 97[2:6] se conviente en 32", resultado[0]==32);
-  
+   
+   
+
   resultado = (char*)bytes_extract_n_bits(arreglo, 7+8, 7+8);
   print_test("Si agarro 1[7:7] obtengo 1", resultado[0]==1);
+   
+   
 
   resultado = (char*)bytes_extract_n_bits(arreglo, 0, 23);
   print_test("Si agarro arreglo[0:23][0] obtengo arreglo[0]", resultado[0]==arreglo[0]);
+   
   
+
   resultado = (char*)bytes_extract_n_bits(arreglo, 0, 23);
   print_test("Si agarro arreglo[0:23][1] obtengo arreglo[1]", resultado[1]==arreglo[1]);
-  
+   
+   
+
   resultado =(char*) bytes_extract_n_bits(arreglo, 0, 23);
   print_test("Si agarro arreglo[0:23][2] obtengo arreglo[2]", resultado[2]==arreglo[2]);
+   
+   
 
   resultado = (char*)bytes_extract_n_bits(arreglo, 8, 23);
   print_test("Si agarro arreglo[8:23][1] obtengo arreglo[2]", resultado[1]==arreglo[2]);
-  
+   
+   
+
   resultado = (char*)bytes_extract_n_bits(arreglo, 8, 15);
   print_test("Si agarro arreglo[8:15][0] obtengo arreglo[1]", resultado[0]==arreglo[1]);
-  
+   
+   
+
   resultado =(char*) bytes_extract_n_bits(arreglo, 16, 16);
   print_test("Si agarro arreglo[16:16][0] obtengo arreglo[2]", resultado[0]==arreglo[2]);
+   
+   
 
   char arreglo2[] = {'*' , 'f', 'r'};
   resultado = (char*)bytes_extract_n_bits(arreglo2, 18, 23);
   print_test("Si agarro arreglo[18:23][0] obtengo 50", resultado[0]==50);
+   
 
 }
 

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "base64.h"
+#include "Base64.h"
 
 #define BYTES_A_LEER 120
 
@@ -51,61 +51,18 @@ void imprimir_ayuda(){
 }
 
 
-int encode_file(FILE* input_file, FILE* output_file){
-  bool stop = false;
-  int longitud;
-  while (!stop){
-    int byte_leido;
-    char* encoding;
-    char* linea = (char*)malloc(sizeof(char)*BYTES_A_LEER);
-    if(!linea) return -1;
-    int cantidad_bytes_leidos = 0;
-    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF)  {
-      linea[cantidad_bytes_leidos] = (char)byte_leido;
-      cantidad_bytes_leidos++;
-    }
-    if(byte_leido == EOF) stop = true;
-    if(cantidad_bytes_leidos != 0){
-      longitud = base64_encode_bytes(linea, cantidad_bytes_leidos, &encoding);
-      if(longitud<0){
-        free(linea);
-        return -1;
-      }
-      fwrite((void*)encoding, 1, longitud, output_file);
-      free(encoding);
-    }
-    free(linea);
-  }
+int wrapper_encode_file(FILE* input_file, FILE* output_file){
+  int fd_entrada = fileno(input_file);
+  int fd_salida = fileno(output_file);
 
-  return EXIT_SUCCESS;
+  return base64_encode(fd_entrada, fd_salida);
 }
 
-int decode_file(FILE* input_file, FILE* output_file){
-  bool stop = false;
-  int longitud;
-  while(!stop){
-    char* linea = malloc(sizeof(char)*BYTES_A_LEER);
-    if(!linea) return -1;
-    int byte_leido;
-    char* decoding;
-    int i;
-    int cantidad_bytes_leidos = 0;
-    while (cantidad_bytes_leidos < BYTES_A_LEER && (byte_leido = fgetc(input_file)) != EOF) {
-      linea[cantidad_bytes_leidos] = (char)byte_leido;
-      cantidad_bytes_leidos++;
-    }
-    if(byte_leido == EOF) stop = true;
-    if(cantidad_bytes_leidos != 0){
-      longitud = base64_decode_bytes(linea, cantidad_bytes_leidos, &decoding);
-      if(longitud<0){
-        return -1;
-      }
-      fwrite((void*)decoding, 1, longitud, output_file);
-      free(decoding);
-    }
-    free(linea);
-  }
-  return EXIT_SUCCESS;
+int wrapper_decode_file(FILE* input_file, FILE* output_file){
+  int fd_entrada = fileno(input_file);
+  int fd_salida = fileno(output_file);
+
+  return base64_decode(fd_entrada, fd_salida);
 }
 
 int main(int argc, char* argv[]){
@@ -114,7 +71,7 @@ int main(int argc, char* argv[]){
 
   //default encode entrada estandar.
   if (argc == 1){
-    int result = encode_file(stdin, stdout);
+    int result = wrapper_encode_file(stdin, stdout);
     if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
     return result;
   }
@@ -147,10 +104,10 @@ int main(int argc, char* argv[]){
       //caso ./main -a encode(decode) sin archivos.
       if (!argv[i]){
         if (encode)
-          result = encode_file(stdin, stdout);
+          result = wrapper_encode_file(stdin, stdout);
         else
-          result = decode_file(stdin, stdout);
-        if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
+          result = wrapper_decode_file(stdin, stdout);
+        if(result!=0) fprintf(stderr, "%s\n", errmsg[result]);
         return result;
       }
       //./main -a encode(decode) -i inputfile
@@ -181,12 +138,12 @@ int main(int argc, char* argv[]){
           }
           FILE* output_file = fopen(argv[i], "w");
           if(encode){
-            result = encode_file(input_file, output_file);
+            result = wrapper_encode_file(input_file, output_file);
           }
           else{
-            result = decode_file(input_file, output_file);
+            result = wrapper_decode_file(input_file, output_file);
           }
-          if(result!=0) fprintf(stderr, "%s\n", ERROR_PERFORMING_ACTION);
+          if(result!=0) fprintf(stderr, "%s\n", errmsg[result]);
           return result;
         }
         else{
@@ -207,3 +164,4 @@ int main(int argc, char* argv[]){
   }
   return EXIT_SUCCESS;
 }
+

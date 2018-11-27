@@ -49,3 +49,11 @@ char* bytes_extract_n_bits(char* bytes, int initial_n, int last_n){
   }
   return bits;
 }
+
+#include <stddef.h>
+#include <stdio.h>
+void imprimir_numeros(int n)
+{
+  for (int i = 0; i <= n; i++)
+    printf("%i\n", i);
+}

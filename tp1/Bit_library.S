@@ -1,8 +1,6 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-
-
 .text
 .abicalls
 .align 2
